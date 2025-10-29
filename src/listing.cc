@@ -1,7 +1,8 @@
 // CMSC 430 Compiler Theory and Design
-// Project 1 Skeleton
+//Michael Groves
+// Project 1
 // UMGC CITE
-// Summer 2023
+// 10/28/2025
 
 // This file contains the bodies of the functions that produces the 
 // compilation listing
