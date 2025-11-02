@@ -1,17 +1,14 @@
-// Program Containing the New Comment, Modified Identifier 
-//     and Real Literal and Hex and Character Literals
+// Function with an If Statemnt
 
--- This is the new style comment
-
-function main b: integer, c: integer returns integer;
-     a: real is .3;
-     d: real is 5.7;
-     a__1: real is .4e2;
-     ab_c_d: real is 4.3E+1;
-     ab1_cd2: real is 4.5e-1;
-     hex: integer is #2aF;
-     char1: character is 'C';
-     char2: character is '\n';
+function main a: integer returns integer;
 begin
-     hex + 2;
+    if a < 10 then
+        1;
+    elsif a < 20 then
+        2;
+    elsif a < 30 then
+        3;
+    else
+        4;
+    endif; 
 end;
