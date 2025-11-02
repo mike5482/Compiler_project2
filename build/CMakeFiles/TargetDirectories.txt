@@ -1,0 +1,3 @@
+/home/mike/projects/Compiler_project/build/CMakeFiles/compile.dir
+/home/mike/projects/Compiler_project/build/CMakeFiles/edit_cache.dir
+/home/mike/projects/Compiler_project/build/CMakeFiles/rebuild_cache.dir
