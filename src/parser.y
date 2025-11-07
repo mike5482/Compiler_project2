@@ -20,45 +20,39 @@ void yyerror(const char* message);
 
 %define parse.error verbose
 
-%token IDENTIFIER INT_LITERAL CHAR_LITERAL
 
-%token ADDOP MULOP ANDOP RELOP ARROW
+%token IDENTIFIER INT_LITERAL CHAR_LITERAL FLOAT_LITERAL HEX_LITERAL
+%token ADDOP MULOP REMOP EXPOP NEGOP ANDOP OROP NOTOP RELOP ARROW
 %token BEGIN_ CASE CHARACTER END ENDSWITCH FUNCTION INTEGER IS LIST OF OTHERS RETURNS SWITCH WHEN
-%token IDENTIFIER INT_LITERAL CHAR_LITERAL ELSE ELSEIF ENDFOLD ENDIF FOLD IF LEFT REAL RIGHT THEN
-%token FLOAT_LITERAL OROP NOTOP REMOP EXPOP NEGOP HEX_LITERAL
-
-
-
-%token ADDOP MULOP ANDOP RELOP ARROW
-
-%token BEGIN_ CASE CHARACTER ELSE END ENDSWITCH FUNCTION INTEGER IS LIST OF OTHERS
-	RETURNS SWITCH WHEN
+%token ELSE ELSEIF ENDFOLD ENDIF FOLD IF LEFT REAL RIGHT THEN
 
 %%
 
-function:	
+function:
 	function_header optional_variable body ;
 
-function_header:	
+function_header:
 	FUNCTION IDENTIFIER RETURNS type ';'  ;
 
 type:
 	INTEGER |
-	CHARACTER ;
-	
+	CHARACTER |
+	REAL;
+
 optional_variable:
 	variable |
 	%empty ;
-    
-variable:	
+
+variable:
 	IDENTIFIER ':' type IS statement ';' |
 	IDENTIFIER ':' LIST OF type IS list ';' ;
 
 list:
-	'(' expressions ')' ;
+	'(' expressions ')'
+	| IDENTIFIER;
 
 expressions:
-	expressions ',' expression| 
+	expressions ',' expression|
 	expression ;
 
 body:
@@ -67,18 +61,31 @@ body:
 statement_:
 	statement ';' |
 	error ';' ;
-    
+
 statement:
-	expression |
-	WHEN condition ',' expression ':' expression |
-	SWITCH expression IS cases OTHERS ARROW statement ';' ENDSWITCH ;
+    expression
+  | WHEN condition ',' expression ':' expression
+  | SWITCH expression IS cases OTHERS ARROW statement_ ENDSWITCH
+  | IF condition THEN statement_ elsif_clauses ELSE statement_ ENDIF
+  | FOLD direction operator expression IS list ARROW statement_ ENDFOLD
+  | FOLD direction operator list ENDFOLD
+    ;
+
+
+
+elsif_clauses:
+    elsif_clauses elsif_clause |
+    %empty ;
+
+elsif_clause:
+    ELSEIF condition THEN statement_ ;
 
 cases:
 	cases case |
 	%empty ;
-	
+
 case:
-	CASE INT_LITERAL ARROW statement ';' ; 
+	CASE INT_LITERAL ARROW statement ';' ;
 
 condition:
 	condition ANDOP relation |
@@ -88,10 +95,24 @@ relation:
 	'(' condition ')' |
 	expression RELOP expression ;
 
+direction:
+    LEFT
+  | RIGHT
+;
+
+operator:
+    ADDOP
+  | MULOP
+  | REMOP
+  | EXPOP
+  | NEGOP
+;
+
+
 expression:
 	expression ADDOP term |
 	term ;
-      
+
 term:
 	term MULOP primary |
 	primary ;
@@ -99,6 +120,7 @@ term:
 primary:
 	'(' expression ')' |
 	INT_LITERAL |
+	FLOAT_LITERAL |
 	CHAR_LITERAL |
 	IDENTIFIER '(' expression ')' |
 	IDENTIFIER ;
@@ -114,4 +136,4 @@ int main(int argc, char *argv[]) {
 	yyparse();
 	lastLine();
 	return 0;
-} 
+}
