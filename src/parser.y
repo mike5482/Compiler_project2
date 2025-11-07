@@ -29,19 +29,34 @@ void yyerror(const char* message);
 %%
 
 function:
-	function_header optional_variable body ;
+	function_header variable_list body ;
 
 function_header:
-	FUNCTION IDENTIFIER RETURNS type ';'  ;
+    FUNCTION IDENTIFIER parameter_list RETURNS type ';'
+  | FUNCTION IDENTIFIER RETURNS type ';' ;
+
 
 type:
 	INTEGER |
 	CHARACTER |
 	REAL;
 
-optional_variable:
-	variable |
-	%empty ;
+
+parameter_list:
+    %empty
+  | parameters ;
+
+parameters:
+    parameters ',' parameter
+  | parameter ;
+
+parameter:
+    IDENTIFIER ':' type ;
+
+
+variable_list:
+    %empty
+  | variable_list variable ;
 
 variable:
 	IDENTIFIER ':' type IS statement ';' |
