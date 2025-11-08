@@ -32,7 +32,7 @@ function:
 	function_header variable_list body ;
 
 function_header:
-    FUNCTION IDENTIFIER parameter_list RETURNS type ';'
+    FUNCTION IDENTIFIER parameters RETURNS type ';'
   | FUNCTION IDENTIFIER RETURNS type ';' ;
 
 
@@ -41,14 +41,10 @@ type:
 	CHARACTER |
 	REAL;
 
-
-parameter_list:
-    %empty
-  | parameters ;
-
 parameters:
     parameters ',' parameter
-  | parameter ;
+  | parameter
+  | %empty ;
 
 parameter:
     IDENTIFIER ':' type ;
@@ -108,7 +104,8 @@ condition:
 
 relation:
 	'(' condition ')' |
-	expression RELOP expression ;
+	expression RELOP expression |
+	 expression ;
 
 direction:
     LEFT
@@ -125,21 +122,46 @@ operator:
 
 
 expression:
-	expression ADDOP term |
-	term ;
+    logical_or_expression ;
 
-term:
-	term MULOP primary |
-	primary ;
+logical_or_expression:
+    logical_or_expression OROP logical_and_expression
+  | logical_and_expression ;
+
+logical_and_expression:
+    logical_and_expression ANDOP relational_expression
+  | relational_expression ;
+
+relational_expression:
+    relational_expression RELOP additive_expression
+  | additive_expression ;
+
+additive_expression:
+    additive_expression ADDOP multiplicative_expression
+  | multiplicative_expression ;
+
+multiplicative_expression:
+    multiplicative_expression MULOP exponential_expression
+  | multiplicative_expression REMOP exponential_expression
+  | exponential_expression ;
+
+exponential_expression:
+    unary_expression EXPOP exponential_expression
+  | unary_expression ;
+
+unary_expression:
+    NEGOP unary_expression
+  | NOTOP unary_expression
+  | primary ;
 
 primary:
-	'(' expression ')' |
-	INT_LITERAL |
-	FLOAT_LITERAL |
-	CHAR_LITERAL |
-	IDENTIFIER '(' expression ')' |
-	IDENTIFIER ;
-
+    '(' expression ')'
+  | INT_LITERAL
+  | FLOAT_LITERAL
+  | HEX_LITERAL
+  | CHAR_LITERAL
+  | IDENTIFIER '(' expression ')'
+  | IDENTIFIER ;
 %%
 
 void yyerror(const char* message) {
