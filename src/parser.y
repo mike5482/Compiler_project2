@@ -33,7 +33,8 @@ function:
 
 function_header:
     FUNCTION IDENTIFIER parameters RETURNS type ';'
-  | FUNCTION IDENTIFIER RETURNS type ';' ;
+  | FUNCTION IDENTIFIER RETURNS type ';'
+  | FUNCTION error RETURNS type ';' ;
 
 
 type:
@@ -55,8 +56,9 @@ variable_list:
   | variable_list variable ;
 
 variable:
-	IDENTIFIER ':' type IS statement ';' |
-	IDENTIFIER ':' LIST OF type IS list ';' ;
+	IDENTIFIER ':' type IS statement ';'
+	| IDENTIFIER ':' LIST OF type IS list ';'
+	| error ';' ;
 
 list:
 	'(' expressions ')'
@@ -76,6 +78,7 @@ statement_:
 statement:
     expression
   | WHEN condition ',' expression ':' expression
+  | WHEN error ';'
   | SWITCH expression IS cases OTHERS ARROW statement_ ENDSWITCH
   | IF condition THEN statement_ elsif_clauses ELSE statement_ ENDIF
   | FOLD direction operator expression IS list ARROW statement_ ENDFOLD
@@ -96,7 +99,8 @@ cases:
 	%empty ;
 
 case:
-	CASE INT_LITERAL ARROW statement ';' ;
+	CASE INT_LITERAL ARROW statement ';'
+	| error ';' ;
 
 condition:
 	condition ANDOP relation |
